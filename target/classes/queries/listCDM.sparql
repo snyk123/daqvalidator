@@ -1,0 +1,20 @@
+#List of category - dimension - metric
+
+PREFIX daq:<http://purl.org/eis/vocab/daq#>
+PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd:<http://www.w3.org/2001/XMLSchema#>
+
+SELECT DISTINCT ?category ?dimension ?metric {
+	?category rdfs:subClassOf daq:Category .
+	?dimension rdfs:subClassOf daq:Dimension .
+	?metric rdfs:subClassOf daq:Metric .
+	
+	?hasDimension rdfs:domain ?category .
+	?hasDimension rdfs:range ?dimension .
+	?hasMetric rdfs:domain ?dimension .
+	?hasMetric rdfs:range  ?metric.
+	
+	?hasDimension rdfs:subPropertyOf daq:hasDimension .
+	?hasMetric rdfs:subPropertyOf daq:hasMetric .
+}
