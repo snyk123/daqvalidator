@@ -70,6 +70,14 @@
 						<mainClass>com.github.jerdeb.daqvalidator.Main</mainClass>
 					</configuration>
 				</plugin>
+			<plugin>
+              <groupId>com.heroku.sdk</groupId>
+              <artifactId>heroku-maven-plugin</artifactId>
+              <version>0.3.5</version>
+              <configuration>
+                <appName>vast-tundra-3065</appName>
+              </configuration>
+            </plugin>
 			</plugins>
 		</pluginManagement>
 	</build>

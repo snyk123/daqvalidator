@@ -1,1 +1,1 @@
-web: mvn exec:java -X
+web: java $JAVA_OPTS -cp target/classes:target/dependency/* Main<
