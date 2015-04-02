@@ -8,6 +8,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +23,7 @@ public class Resource {
 	@POST
 	@Path("validate")
 	@Produces(MediaType.APPLICATION_JSON)
-	public String validate(MultivaluedMap<String, String> formParams) {
+	public Response validate(MultivaluedMap<String, String> formParams) {
 		
 		String schema = "";
 		com.hp.hpl.jena.rdf.model.Resource resource = null ;
@@ -37,9 +38,11 @@ public class Resource {
 			List<String> lstType = formParams.get("type");
 			
 			if (lstType == null || lstType.size() <= 0){
+				logger.error("Type parameter was not provided");
 				throw new IllegalArgumentException("Type parameter was not provided");
 			}
 			if (lstSchema == null || lstSchema.size() <= 0){
+				logger.error("Input parameter was not provided");
 				throw new IllegalArgumentException("Input parameter was not provided");
 			}
 			inputType = lstType.get(0);
@@ -55,7 +58,10 @@ public class Resource {
 				uuid = v.addSchema(resource);
 			}
 			else if (inputType.equals("f")) {}
-			else throw new IllegalArgumentException("Type parameter was incorrectly provided : "+ inputType);
+			else {
+				logger.error("Type parameter was incorrectly provided: {}", inputType);
+				throw new IllegalArgumentException("Type parameter was incorrectly provided : "+ inputType);
+			}
 			
 			
 			sb.append("{");
@@ -71,10 +77,13 @@ public class Resource {
 			sb.append("{");
 			sb.append("\"uid\" : \""+uuid+"\",");
 			sb.append("\"timestamp\" : \""+errorTimeStamp+"\",");
-			sb.append("\"errormessage\" : \""+ex.getMessage()+"\",");
+			sb.append("\"errormessage\" : \""+ex.getMessage()+"\"");
 			sb.append("}");
 		}
 		
-		return sb.toString();
+		logger.info("Response: {}", sb.toString());
+		return Response.ok(sb.toString(),MediaType.APPLICATION_JSON).header("Access-Control-Allow-Origin", "*")
+				.header("Access-Control-Allow-Methods", "POST, GET, PUT, UPDATE, OPTIONS")
+			      .header("Access-Control-Allow-Headers", "x-requested-with, x-requested-by").build();
 	}
 }

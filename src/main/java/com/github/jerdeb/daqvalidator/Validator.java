@@ -96,13 +96,14 @@ public class Validator {
 	    }
 	    
 	    StringBuilder sb = new StringBuilder();
+	    sb.append("\"category\" : [");
 	    for(String c : cat.keySet()){
 	    	Category _c = cat.get(c);
 	    	sb.append(_c.toString());
 	    	sb.append(",");
 	    }
 	    sb.deleteCharAt(sb.length() - 1);
-	    
+	    sb.append("]");
 	    return sb.toString();
 	}
 
