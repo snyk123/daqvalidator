@@ -165,27 +165,31 @@ public class Validator {
 	    
 	    StringBuilder sb = new StringBuilder();
 	    sb.append("\"errors\" : {");
-	    sb.append("\"total\" : "+totalErrors+", ");
-	    sb.append("\"messages\" : [");
+	    sb.append("\"total\" : "+totalErrors+",");
 	    
-	    for(String d : multDim.keySet()){
-	    	List<String> c = multDim.get(d);
-	    	StringBuilder error = new StringBuilder("The dimension " + d + " is in " + c.size() + " categories. ");
-	    	for(String _c : c) 
-	    		error.append(_c + ", ");
-	    	error.deleteCharAt(error.length() - 2);
-	    	sb.append("\""+error.toString().trim() + "\",");
+	    if (totalErrors > 0){
+		    sb.append("\"messages\" : [");
+		    
+		    for(String d : multDim.keySet()){
+		    	List<String> c = multDim.get(d);
+		    	StringBuilder error = new StringBuilder("The dimension " + d + " is in " + c.size() + " categories. ");
+		    	for(String _c : c) 
+		    		error.append(_c + ", ");
+		    	error.deleteCharAt(error.length() - 2);
+		    	sb.append("\""+error.toString().trim() + "\",");
+		    }
+		    
+		    for(String met : multMetric.keySet()){
+		    	List<String> d = multMetric.get(met);
+		    	StringBuilder error = new StringBuilder("The metric " + met + " is in " + d.size() + " dimensions. ");
+		    	for(String _d : d) error.append(_d + ", ");
+		    	error.deleteCharAt(error.length() - 2);
+		    	sb.append("\""+error.toString().trim() + "\",");
+		    }
+		    sb.deleteCharAt(sb.length() - 1);
+		    sb.append("]");
 	    }
-	    
-	    for(String met : multMetric.keySet()){
-	    	List<String> d = multMetric.get(met);
-	    	StringBuilder error = new StringBuilder("The metric " + met + " is in " + d.size() + " dimensions. ");
-	    	for(String _d : d) error.append(_d + ", ");
-	    	error.deleteCharAt(error.length() - 2);
-	    	sb.append("\""+error.toString().trim() + "\",");
-	    }
-	    sb.deleteCharAt(sb.length() - 1);
-	    sb.append("]");
+	    else sb.deleteCharAt(sb.length() - 1);
 	    sb.append("}");
 	    
 	    return sb.toString();
@@ -229,14 +233,18 @@ public class Validator {
 	    
 	    StringBuilder sb = new StringBuilder();
 	    sb.append("\"warnings\" : {");
-	    sb.append("\"total\" : "+totalWarnings+", ");
-	    sb.append("\"messages\" : [");
-	    for(String s : dim)
-	    	sb.append("\"The dimension " + s + " is not linked to any category.\",");
-	    for(String s : met)
-	    	sb.append("\"The metric " + s + " is not linked to any dimension.\",");
-	    sb.deleteCharAt(sb.length() - 1);
-	    sb.append("]");
+	    sb.append("\"total\" : "+totalWarnings+",");
+	    
+	    if(totalWarnings > 0){
+		    sb.append("\"messages\" : [");
+		    for(String s : dim)
+		    	sb.append("\"The dimension " + s + " is not linked to any category.\",");
+		    for(String s : met)
+		    	sb.append("\"The metric " + s + " is not linked to any dimension.\",");
+		    sb.deleteCharAt(sb.length() - 1);
+		    sb.append("]");
+	    }
+	    else sb.deleteCharAt(sb.length() - 1);
 	    sb.append("}");
 	    
 	    return sb.toString();

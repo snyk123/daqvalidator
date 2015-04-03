@@ -1,13 +1,15 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>com.github.jerdeb</groupId>
-  <artifactId>daqvalidator</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
-  <name>daQ Validator</name>
-  <description>Validates quality schemas based on daQ </description>
-  
-  
-  <properties>
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.github.jerdeb</groupId>
+	<artifactId>daqvalidator</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>daQ Validator</name>
+	<description>Validates quality schemas based on daQ </description>
+
+
+	<properties>
 		<jdk.version>1.7</jdk.version>
 		<junit.version>4.11</junit.version>
 		<log4j.version>1.2.16</log4j.version>
@@ -18,7 +20,7 @@
 		<guava.version>18.0</guava.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
-	
+
 	<dependencies>
 		<dependency>
 			<groupId>org.glassfish.jersey.containers</groupId>
@@ -30,7 +32,7 @@
 			<artifactId>jersey-media-json-processing</artifactId>
 			<version>${jerseymedia.version}</version>
 		</dependency>
-  		<dependency>
+		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-jdk14</artifactId>
 			<version>${slf4j.version}</version>
@@ -51,8 +53,8 @@
 			<version>${guava.version}</version>
 		</dependency>
 	</dependencies>
-	
-		<build>
+
+	<build>
 		<pluginManagement>
 			<plugins>
 				<plugin>
@@ -70,17 +72,30 @@
 						<mainClass>com.github.jerdeb.daqvalidator.Main</mainClass>
 					</configuration>
 				</plugin>
-			<plugin>
-              <groupId>com.heroku.sdk</groupId>
-              <artifactId>heroku-maven-plugin</artifactId>
-              <version>0.3.5</version>
-              <configuration>
-                <appName>vast-tundra-3065</appName>
-              </configuration>
-            </plugin>
+				<plugin>
+					<groupId>com.heroku.sdk</groupId>
+					<artifactId>heroku-maven-plugin</artifactId>
+					<version>0.3.5</version>
+					<configuration>
+						<appName>vast-tundra-3065</appName>
+					</configuration>
+				</plugin>
+				<plugin>
+					<artifactId>maven-assembly-plugin</artifactId>
+					<configuration>
+						<archive>
+							<manifest>
+								<mainClass>com.github.jerdeb.daqvalidator.Main</mainClass>
+							</manifest>
+						</archive>
+						<descriptorRefs>
+							<descriptorRef>jar-with-dependencies</descriptorRef>
+						</descriptorRefs>
+					</configuration>
+				</plugin>
 			</plugins>
 		</pluginManagement>
 	</build>
-			
-	
+
+
 </project>
