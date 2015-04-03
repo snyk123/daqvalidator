@@ -1,13 +1,11 @@
 package com.github.jerdeb.daqvalidator;
 
 import java.io.IOException;
-import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
 
-import javax.json.stream.JsonGenerator;
-
-import org.glassfish.grizzly.http.server.HttpServer;
-import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
-import org.glassfish.jersey.server.ResourceConfig;
+import com.sun.grizzly.http.SelectorThread;
+import com.sun.jersey.api.container.grizzly.GrizzlyWebContainerFactory;
 
 
 public class Main {
@@ -22,15 +20,6 @@ public class Main {
 	
 
 
-    /**
-     * Starts Grizzly HTTP server exposing JAX-RS resources defined in this application.
-     * @return Grizzly HTTP server.
-     */
-    public static HttpServer startServer() {
-       final ResourceConfig rc = new ResourceConfig().packages("com.github.jerdeb.daqvalidator").property(JsonGenerator.PRETTY_PRINTING, true);
-
-       return GrizzlyHttpServerFactory.createHttpServer(URI.create(BASEURI), rc);
-    }
 
     /**
      * Main method.
@@ -41,19 +30,28 @@ public class Main {
     	    	
     	// Start server and wait for user input to stop
     	    	
-        final HttpServer server = startServer();
         
-        try {
-            server.start();
-            System.out.println(String.format("Jersey app started with WADL available at " + "%sapplication.wadl\n", BASEURI));
-            // Wait forever (i.e. until the JVM instance is terminated externally)
-            Thread.currentThread().join();
-        } catch (Exception ioe) {
-            System.out.println("Error running service: " + ioe.toString());
-        } finally {
-        	if(server != null && server.isStarted()) {
-        		server.shutdownNow();
-        	}
-        }
+
+        final Map<String, String> initParams = new HashMap<String, String>();
+
+        initParams.put("com.sun.jersey.config.property.packages","resources");
+        
+        System.out.println("Starting grizzly...");
+        SelectorThread threadSelector = GrizzlyWebContainerFactory.create(BASEURI, initParams);
+        threadSelector.start();
+        System.out.println(String.format("Jersey app started with WADL available at " + "%sapplication.wadl\n", BASEURI));
+        
+//        try {
+//        	threadSelector.start();
+//            System.out.println(String.format("Jersey app started with WADL available at " + "%sapplication.wadl\n", BASEURI));
+//            // Wait forever (i.e. until the JVM instance is terminated externally)
+//            Thread.currentThread().join();
+//        } catch (Exception ioe) {
+//            System.out.println("Error running service: " + ioe.toString());
+//        } finally {
+//        	if(server != null && threadSelector.i.isStarted()) {
+//        		server.shutdownNow();
+//        	}
+//        }
     }
 }
