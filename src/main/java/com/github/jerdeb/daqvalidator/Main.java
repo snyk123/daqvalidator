@@ -14,10 +14,11 @@ public class Main {
 	// Base URI the Grizzly HTTP server will listen on
 	private static final String SCHEME = "http";
 	private static final String DOMAIN = "localhost";
-	private static final String PORT_NUMBER = "8080";
+	private static final String PORT_NUMBER = "5000";
 	private static final String APPLICATION = "daqvalidator";
-	
+//	
 	 public static final String BASE_URI = SCHEME+"://"+DOMAIN+":"+PORT_NUMBER+"/"+ APPLICATION + "/";
+	
 
 
     /**
