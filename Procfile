@@ -1,2 +1,1 @@
-web: java $JAVA_OPTS -cp target/dependency/*:target/classes Main
-
+web:    java -cp target/dependency/*:target/classes com.github.jerdeb.daqvalidator.Main
