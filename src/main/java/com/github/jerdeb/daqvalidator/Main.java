@@ -15,7 +15,10 @@ public class Main {
 	private static final String SCHEME = "http";
 	private static final String DOMAIN = "localhost";
 	private static final String APPLICATION = "daqvalidator";
-//	
+	private static final String PORT = (System.getenv("PORT")!=null?System.getenv("PORT"):"9998");
+
+	private static final String BASEURI = SCHEME+"://"+DOMAIN+":"+PORT+"/"+ APPLICATION + "/";
+
 	
 
 
@@ -23,9 +26,10 @@ public class Main {
      * Starts Grizzly HTTP server exposing JAX-RS resources defined in this application.
      * @return Grizzly HTTP server.
      */
-    public static HttpServer startServer(String uri) {
-        final ResourceConfig rc = new ResourceConfig().packages("com.github.jerdeb.daqvalidator").property(JsonGenerator.PRETTY_PRINTING, true);
-       return GrizzlyHttpServerFactory.createHttpServer(URI.create(uri), rc);
+    public static HttpServer startServer() {
+       final ResourceConfig rc = new ResourceConfig().packages("com.github.jerdeb.daqvalidator").property(JsonGenerator.PRETTY_PRINTING, true);
+
+       return GrizzlyHttpServerFactory.createHttpServer(URI.create(BASEURI), rc);
     }
 
     /**
@@ -36,13 +40,12 @@ public class Main {
     public static void main(String[] args) throws IOException {
     	    	
     	// Start server and wait for user input to stop
-    	String uri = SCHEME+"://"+DOMAIN+":"+args[0]+"/"+ APPLICATION + "/";
-    	
-        final HttpServer server = startServer(uri);
+    	    	
+        final HttpServer server = startServer();
         
         try {
             server.start();
-            System.out.println(String.format("Jersey app started with WADL available at " + "%sapplication.wadl\n", uri));
+            System.out.println(String.format("Jersey app started with WADL available at " + "%sapplication.wadl\n", BASEURI));
             // Wait forever (i.e. until the JVM instance is terminated externally)
             Thread.currentThread().join();
         } catch (Exception ioe) {
