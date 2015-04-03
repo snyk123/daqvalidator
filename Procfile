@@ -1,1 +1,1 @@
-web: java $JAVA_OPTS -Ddw.server.connector.port=$PORT -jar target/*-dependencies.jar $PORT
+web: java $JAVA_OPTS -Dserver.port=$PORT -jar target/*-dependencies.jar $PORT
