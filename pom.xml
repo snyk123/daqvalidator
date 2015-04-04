@@ -67,7 +67,7 @@
 						</execution>
 					</executions>
 					<configuration>
-						<mainClass>de.unibonn.iai.eis.luzzu.communications.Main</mainClass>
+						<mainClass>com.github.jerdeb.daqvalidator.Main</mainClass>
 					</configuration>
 				</plugin>
 

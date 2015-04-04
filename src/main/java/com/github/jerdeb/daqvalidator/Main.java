@@ -13,8 +13,8 @@ import org.glassfish.jersey.server.ResourceConfig;
 public class Main {
 	// Base URI the Grizzly HTTP server will listen on
 	private static final String SCHEME = "http";
-	private static final String DOMAIN = (System.getenv("OPENSHIFT_INTERNAL_IP") != null) ? System.getenv("OPENSHIFT_INTERNAL_IP") : "localhost";
-	private static final String PORT_NUMBER = (System.getenv("OPENSHIFT_INTERNAL_PORT") != null) ? System.getenv("OPENSHIFT_INTERNAL_PORT") : "15001" ;
+	private static final String DOMAIN = (System.getenv("OPENSHIFT_PYTHON_IP") != null) ? System.getenv("OPENSHIFT_PYTHON_IP") : "localhost";
+	private static final String PORT_NUMBER = "15001" ;
 	private static final String APPLICATION = "daqvalidator";
 	
 	 public static final String BASE_URI = SCHEME+"://"+DOMAIN+":"+PORT_NUMBER+"/"+ APPLICATION + "/";
