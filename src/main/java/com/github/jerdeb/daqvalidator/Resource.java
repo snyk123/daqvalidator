@@ -86,4 +86,15 @@ public class Resource {
 				.header("Access-Control-Allow-Methods", "POST, GET, PUT, UPDATE, OPTIONS")
 			      .header("Access-Control-Allow-Headers", "x-requested-with, x-requested-by").build();
 	}
+
+	
+	@POST
+	@Path("edit")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response edit(MultivaluedMap<String, String> formParams) {
+	
+		
+		return null;
+	}
+
 }

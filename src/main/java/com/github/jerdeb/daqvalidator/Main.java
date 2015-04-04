@@ -13,8 +13,8 @@ import org.glassfish.jersey.server.ResourceConfig;
 public class Main {
 	// Base URI the Grizzly HTTP server will listen on
 	private static final String SCHEME = "http";
-	private static final String DOMAIN = "localhost";
-	private static final String PORT_NUMBER = System.getenv("PORT") != null ? System.getenv("PORT") : "8080" ;
+	private static final String DOMAIN = (System.getenv("OPENSHIFT_INTERNAL_IP") != null) ? System.getenv("OPENSHIFT_INTERNAL_IP") : "localhost";
+	private static final String PORT_NUMBER = (System.getenv("OPENSHIFT_INTERNAL_PORT") != null) ? System.getenv("OPENSHIFT_INTERNAL_PORT") : "8080" ;
 	private static final String APPLICATION = "daqvalidator";
 	
 	 public static final String BASE_URI = SCHEME+"://"+DOMAIN+":"+PORT_NUMBER+"/"+ APPLICATION + "/";
@@ -26,7 +26,8 @@ public class Main {
      */
     public static HttpServer startServer() {
         final ResourceConfig rc = new ResourceConfig().packages("com.github.jerdeb.daqvalidator").property(JsonGenerator.PRETTY_PRINTING, true);
-       return GrizzlyHttpServerFactory.createHttpServer(URI.create(BASE_URI), rc);
+        
+        return GrizzlyHttpServerFactory.createHttpServer(URI.create(BASE_URI), rc);
     }
 
     /**
@@ -38,6 +39,7 @@ public class Main {
     	    	
     	// Start server and wait for user input to stop
         final HttpServer server = startServer();
+        
         
         try {
             server.start();
