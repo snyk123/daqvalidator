@@ -5,14 +5,21 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
+import com.github.jerdeb.daqvalidator.datatypes.Category;
+import com.github.jerdeb.daqvalidator.datatypes.Dimension;
+import com.github.jerdeb.daqvalidator.datatypes.Metric;
+import com.github.jerdeb.daqvalidator.datatypes.Report;
 import com.google.common.base.Charsets;
 import com.google.common.io.Resources;
 import com.hp.hpl.jena.query.Dataset;
@@ -26,7 +33,10 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
 
+
 public class Validator {
+	
+	private Logger logger = LoggerFactory.getLogger(Validator.class);
 	
 	Dataset clientSchemas = ValidatorFactory.getDataset();
 	
@@ -67,51 +77,49 @@ public class Validator {
 	    QueryExecution qe = QueryExecutionFactory.create(qry, m);
 	    ResultSet rs = qe.execSelect();
 
-	    Map<String, Category> cat = new HashMap<String, Category>();
+	    
+	    List<Category> cat = new ArrayList<Category>();
 	    
 	    while (rs.hasNext()){
 	    	QuerySolution qs = rs.next();
 	    	String category = qs.get("category").asResource().getLocalName();
 	    	String dimension = qs.get("dimension").asResource().getLocalName();
 	    	String metric = qs.get("metric").asResource().getLocalName();
-
-	    	if(cat.containsKey(category)){
-	    		Category c = cat.get(category);
-	    		if (c.dim.containsKey(dimension)){
-	    			List<String> mList = c.dim.get(dimension);
-	    			mList.add(metric);
-	    		} else {
-	    			List<String> mList = new ArrayList<String>();
-	    			mList.add(metric);
-	    			c.dim.put(dimension,mList);
-	    		}
-	    	} else {
-	    		Category c = new Category();
-	    		c.name = category;
-    			List<String> mList = new ArrayList<String>();
-    			mList.add(metric);
-    			c.dim.put(dimension,mList);
-    			cat.put(category, c);
-	    	}
+	    	
+	    	Category c = new Category(category);
+	    	Dimension d = new Dimension(dimension);
+	    	Metric met = new Metric(metric);
+	    	
+	    	if (cat.contains(c)) c = cat.get(cat.indexOf(c));
+	    	else cat.add(c);
+	    	
+	    	List<Dimension> dims = c.getDimensions();
+	    	if (dims.contains(d)) d = dims.get(dims.indexOf(d));
+	    	else c.addDimension(d);
+	    	
+	    	d.addMetric(met);
 	    }
 	    
-	    StringBuilder sb = new StringBuilder();
-	    int count = 0;
-	    sb.append("\"category\" : [");
-	    for(String c : cat.keySet()){
-	    	count++;
-	    	Category _c = cat.get(c);
-	    	sb.append(_c.toString());
-	    	sb.append(",");
+	    String json = "";
+	    for(Category c : cat){
+	    	json = "\"category\" : [";
+	    	ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
+			try {
+				json += ow.writeValueAsString(c) + ",";
+			} catch (JsonProcessingException e) {
+				logger.error("Error transforming to json : {}", e.getMessage());
+			}
+			json = json.substring(0, json.length()-1);
+			json += "]";
 	    }
 	    
-	    if (count > 1) sb.deleteCharAt(sb.lastIndexOf(","));
-	    sb.append("]");
-	    return sb.toString();
+	    return json;
 	}
 
 	public String detectErrors(String uid) throws IOException{
 		Model m = this.clientSchemas.getNamedModel("urn:"+uid);
+		
+		Report error = new Report();
 		
 		// are there any dimensions in multiple categories
 		URL url = Resources.getResource("queries/multDim.sparql");
@@ -121,21 +129,12 @@ public class Validator {
 	    QueryExecution qe = QueryExecutionFactory.create(qry, m);
 	    ResultSet rs = qe.execSelect();
 	    
-	    Map<String,List<String>> multDim = new HashMap<String,List<String>>();
 	    while (rs.hasNext()){
 	    	QuerySolution qs = rs.next();
-	    	String category = qs.get("category").asResource().getLocalName();
-	    	String dimension = qs.get("dimension").asResource().getLocalName();
-	    
-	    	if (multDim.containsKey(dimension)){
-	    		List<String> cat = multDim.get(dimension);
-	    		cat.add(category);
-	    		multDim.put(dimension, cat);
-	    	} else {
-	    		List<String> cat = new ArrayList<String>();
-	    		cat.add(category);
-	    		multDim.put(dimension, cat);
-	    	}
+	    	String d = qs.get("dimension").asResource().getLocalName();
+	    	String c = qs.get("cat").asLiteral().getString();
+	    	
+	    	error.addMessage("The dimension " + d + " is in " + c + " categories. ");
 	    }
 	    	
 	    // are there any dimensions in multiple categories
@@ -146,64 +145,40 @@ public class Validator {
 	    qe = QueryExecutionFactory.create(qry, m);
 	    rs = qe.execSelect();
 	    
-	    Map<String,List<String>> multMetric = new HashMap<String,List<String>>();
 	    while (rs.hasNext()){
 	    	QuerySolution qs = rs.next();
-	    	String dimension = qs.get("dimension").asResource().getLocalName();
-	    	String metric = qs.get("metric").asResource().getLocalName();
+	    	String d = qs.get("dim").asResource().getLocalName();
+	    	String met = qs.get("metric").asResource().getLocalName();
+
+	    	error.addMessage("The metric " + met + " is in " + d + " dimensions. ");
+	    
+	    }
+	    
+	    error.setTotal(error.getMessages().size());
+	    
+	    String json = "";
+	   
+	    if (error.getTotal() > 0)
+    	{
+	    	json = "\"errors\" : {";
+	    	ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
+			try {
+				json += ow.writeValueAsString(error);
+			} catch (JsonProcessingException e) {
+				logger.error("Error transforming to json : {}", e.getMessage());
+			}
+			json += "}";
+    	}
 
 	    
-	    	if (multMetric.containsKey(metric)){
-	    		List<String> dim = multMetric.get(metric);
-	    		dim.add(dimension);
-	    		multMetric.put(metric, dim);
-	    	} else {
-	    		List<String> dim = new ArrayList<String>();
-	    		dim.add(dimension);
-	    		multMetric.put(metric, dim);
-	    	}
-	    }
+	    return json;
 	    
-	    int totalErrors = multDim.size() + multMetric.size();
-	    
-	    StringBuilder sb = new StringBuilder();
-	    sb.append("\"errors\" : {");
-	    sb.append("\"total\" : "+totalErrors+",");
-	    
-	    if (totalErrors > 0){
-		    sb.append("\"messages\" : [");
-		    
-		    for(String d : multDim.keySet()){
-		    	List<String> c = multDim.get(d);
-		    	StringBuilder error = new StringBuilder("The dimension " + d + " is in " + c.size() + " categories. ");
-		    	for(String _c : c) 
-		    		error.append(_c + ", ");
-		    	error.deleteCharAt(error.length() - 2);
-		    	sb.append("\""+error.toString().trim() + "\",");
-		    }
-		    
-		    for(String met : multMetric.keySet()){
-		    	List<String> d = multMetric.get(met);
-		    	StringBuilder error = new StringBuilder("The metric " + met + " is in " + d.size() + " dimensions. ");
-		    	for(String _d : d) error.append(_d + ", ");
-		    	error.deleteCharAt(error.length() - 2);
-		    	sb.append("\""+error.toString().trim() + "\",");
-		    }
-		    sb.deleteCharAt(sb.lastIndexOf(","));
-		    sb.append("]");
-	    }
-	    else sb.deleteCharAt(sb.lastIndexOf(","));
-	    sb.append("}");
-	    
-	    return sb.toString();
 	}
 
 	public String detectWarnings(String uid) throws IOException{
 		Model m = this.clientSchemas.getNamedModel("urn:"+uid);
 		
-		int totalWarnings = 0;
-		List<String> dim = new ArrayList<String>();
-		List<String> met = new ArrayList<String>();
+		Report warning = new Report();
 
 		
 		URL url = Resources.getResource("queries/noLinkedDim.sparql");
@@ -216,8 +191,7 @@ public class Validator {
 	    while (rs.hasNext()){
 	    	QuerySolution qs = rs.next();
 	    	String dimension = qs.get("dimension").asResource().getLocalName();
-	    	dim.add(dimension);
-	    	totalWarnings++;
+	    	warning.addMessage("The dimension " + dimension + " is not linked to any category");
 	    }
 	    
 		url = Resources.getResource("queries/noLinkMetric.sparql");
@@ -230,65 +204,24 @@ public class Validator {
 	    while (rs.hasNext()){
 	    	QuerySolution qs = rs.next();
 	    	String metric = qs.get("metric").asResource().getLocalName();
-	    	met.add(metric);
-	    	totalWarnings++;
-	    }
-	    
-	    StringBuilder sb = new StringBuilder();
-	    sb.append("\"warnings\" : {");
-	    sb.append("\"total\" : "+totalWarnings+",");
-	    
-	    if(totalWarnings > 0){
-		    sb.append("\"messages\" : [");
-		    for(String s : dim)
-		    	sb.append("\"The dimension " + s + " is not linked to any category.\",");
-		    for(String s : met)
-		    	sb.append("\"The metric " + s + " is not linked to any dimension.\",");
-		    sb.deleteCharAt(sb.lastIndexOf(","));
-		    sb.append("]");
-	    }
-	    else sb.deleteCharAt(sb.lastIndexOf(","));
-	    sb.append("}");
-	    
-	    return sb.toString();
-	}
-	
-	private class Category{
-		String name;
-		Map<String, List<String>> dim = new HashMap<String, List<String>>();
-		
-		@Override
-		public String toString(){
-			StringBuilder sb = new StringBuilder();
-			sb.append("{");
-			sb.append("\"name\" : "+ toJSON(name) + ",");
-			sb.append("\"dimension\" : [");
-			
-			//create dimensions
-			for(String d : dim.keySet()){
-				sb.append("{");
-				sb.append("\"name\" : "+ toJSON(d) + ",");
-				sb.append("\"metric\" : [");
-				//create metrics
-				List<String> mL = dim.get(d);
-				for(String m : mL){
-					sb.append(toJSON(m)+",");
-				}
-				sb.deleteCharAt(sb.length() - 1);
-				sb.append("]");
-				sb.append("},");
-			}
-			sb.deleteCharAt(sb.lastIndexOf(","));
-			sb.append("]");
-			sb.append("}");
-			
-			return sb.toString();
-		}
-		
-		private String toJSON(String term){
-			String ret = "\""+term+"\"";
-			return ret;
-		}
-	}
+	    	warning.addMessage("The metric " + metric + " is not linked to any category");
 
+	    }
+	    
+	    String json = "";
+	    if (warning.getTotal() > 0)
+    	{
+	    	json = "\"warnings\" : {";
+	    	ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
+			try {
+				json += ow.writeValueAsString(warning);
+			} catch (JsonProcessingException e) {
+				logger.error("Error transforming to json : {}", e.getMessage());
+			}
+			json += "}";
+    	}
+
+	    
+	    return json;
+	}
 }

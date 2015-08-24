@@ -75,13 +75,15 @@ public class Resource {
 			}
 			
 			
+			String compliant = v.listCompliantCDM(uuid);
+			String errors = v.detectErrors(uuid);
+			String warnings = v.detectWarnings(uuid);
+			
 			sb.append("{");
 			sb.append("\"uid\" : \""+uuid+"\",");
-			sb.append(v.listCompliantCDM(uuid));
-			sb.append(",");
-			sb.append(v.detectErrors(uuid));
-			sb.append(",");		
-			sb.append(v.detectWarnings(uuid));
+			sb.append(compliant);
+			if (!errors.equals("")) sb.append("," + errors);
+			if (!warnings.equals("")) sb.append("," + warnings);
 			sb.append("}");
 		} catch(Exception ex) {
 			String errorTimeStamp = Long.toString((new Date()).getTime());

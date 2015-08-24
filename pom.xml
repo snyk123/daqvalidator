@@ -16,6 +16,8 @@
 		<grizzly.version>2.11</grizzly.version>
 		<jerseymedia.version>2.11</jerseymedia.version>
 		<guava.version>18.0</guava.version>
+		<jackson.version>1.9.13</jackson.version>
+		
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 	
@@ -49,6 +51,11 @@
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
 			<version>${guava.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.codehaus.jackson</groupId>
+			<artifactId>jackson-core-asl</artifactId>
+			<version>${jackson.version}</version>
 		</dependency>
 	</dependencies>
 	

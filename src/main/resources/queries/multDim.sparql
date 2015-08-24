@@ -1,11 +1,6 @@
 #Dimension in more than 1 Category
 
-PREFIX daq:<http://purl.org/eis/vocab/daq#>
-PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#>
-PREFIX xsd:<http://www.w3.org/2001/XMLSchema#>
-
-SELECT DISTINCT ?category ?dimension {
+SELECT DISTINCT ?dimension  (COUNT (?category) as ?cat) {
 	?category rdfs:subClassOf daq:Category .
 	
 	?hasDimension rdfs:domain ?category .
@@ -23,4 +18,4 @@ SELECT DISTINCT ?category ?dimension {
 		GROUP BY ?dimension
 		HAVING(count(?dimension) > 1)
 	}
-}
+} GROUP BY ?dimension
