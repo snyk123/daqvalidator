@@ -104,7 +104,8 @@ public class Validator {
 	    	sb.append(_c.toString());
 	    	sb.append(",");
 	    }
-	    if (count > 1) sb.deleteCharAt(sb.length() - 1);
+	    
+	    if (count > 1) sb.deleteCharAt(sb.lastIndexOf(","));
 	    sb.append("]");
 	    return sb.toString();
 	}
@@ -188,10 +189,10 @@ public class Validator {
 		    	error.deleteCharAt(error.length() - 2);
 		    	sb.append("\""+error.toString().trim() + "\",");
 		    }
-		    sb.deleteCharAt(sb.length() - 1);
+		    sb.deleteCharAt(sb.lastIndexOf(","));
 		    sb.append("]");
 	    }
-	    else sb.deleteCharAt(sb.length() - 1);
+	    else sb.deleteCharAt(sb.lastIndexOf(","));
 	    sb.append("}");
 	    
 	    return sb.toString();
@@ -243,10 +244,10 @@ public class Validator {
 		    	sb.append("\"The dimension " + s + " is not linked to any category.\",");
 		    for(String s : met)
 		    	sb.append("\"The metric " + s + " is not linked to any dimension.\",");
-		    sb.deleteCharAt(sb.length() - 1);
+		    sb.deleteCharAt(sb.lastIndexOf(","));
 		    sb.append("]");
 	    }
-	    else sb.deleteCharAt(sb.length() - 1);
+	    else sb.deleteCharAt(sb.lastIndexOf(","));
 	    sb.append("}");
 	    
 	    return sb.toString();
@@ -277,7 +278,7 @@ public class Validator {
 				sb.append("]");
 				sb.append("},");
 			}
-			sb.deleteCharAt(sb.length() - 1);
+			sb.deleteCharAt(sb.lastIndexOf(","));
 			sb.append("]");
 			sb.append("}");
 			
