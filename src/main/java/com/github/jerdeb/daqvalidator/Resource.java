@@ -3,6 +3,7 @@ package com.github.jerdeb.daqvalidator;
 import java.util.Date;
 import java.util.List;
 
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -20,9 +21,9 @@ public class Resource {
 
 	final static Logger logger = LoggerFactory.getLogger(Resource.class);
 	
-	@POST
+	@GET
 	@Path("status")
-	@Produces(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.TEXT_PLAIN)
 	public Response status() {
 		return Response.ok("Service is Online",MediaType.APPLICATION_JSON).header("Access-Control-Allow-Origin", "*")
 				.header("Access-Control-Allow-Methods", "POST, GET, PUT, UPDATE, OPTIONS")
