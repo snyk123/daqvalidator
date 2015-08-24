@@ -1,0 +1,117 @@
+@prefix daq:     <http://purl.org/eis/vocab/daq#> .
+@prefix ex:     <http://www.example.org/> .
+@prefix owl:	 <http://www.w3.org/2002/07/owl#> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfg:	 <http://www.w3.org/2004/03/trix/rdfg-1> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+
+
+# Categories
+
+ex:Accessibility
+	a	rdfs:Class ;
+	rdfs:subClassOf	daq:Category ;
+	rdfs:comment	"Encompasses dimensions related to the ability to access to and retrieve the dataset required for a particular use case" ;
+	rdfs:label	"Accessibility" .
+
+ex:Intrinsic
+	a	rdfs:Class ;
+	rdfs:subClassOf	daq:Category ;
+	rdfs:comment	"Refers to dimensions that are independent of the user's context and that measure the correctness, succinctness and consistency of the dataset" ;
+	rdfs:label	"Intrinsic" .
+
+
+# Dimensions
+ex:Availability
+	a	rdfs:Class ;
+	rdfs:subClassOf	daq:Dimension ;
+	rdfs:comment	"Metrics in this dimension measure the extent to which information (or some portion of it) is present, obtainable and ready for use" ;
+	rdfs:label	"Availability" .
+	
+ex:Licensing
+	a	rdfs:Class ;
+	rdfs:subClassOf	daq:Dimension ;
+	rdfs:comment	"Indicates whether consumers of the dataset are explicitly granted permissions to use it, under defined conditions (if any)" ;
+	rdfs:label	"Licensing" .
+	
+ex:Accuracy
+	a	rdfs:Class ;
+	rdfs:subClassOf	daq:Dimension ;
+	rdfs:comment	"Extent to which data is correct. The degree to which the dataset correctly represents the real world and how much it is free of syntax errors. Classified in: Syntactic accuracy (the degree to which data values are close to their definition domain) and Semantic accuracy (the degree to which data values correctly represent the actual real world values)" ;
+	rdfs:label	"Accuracy" .
+			
+
+# Metrics
+ex:EndPointAvailabilityMetric
+	a	rdfs:Class ;
+	rdfs:subClassOf	daq:Metric ; 
+	daq:expectedDataType xsd:double ;
+	rdfs:comment	"Checks whether the server (endpoint) is reachable and responds to a SPARQL query" ;
+	rdfs:label	"Availability of the SPARQL end-point metric" .		
+
+ex:RDFAvailabilityMetric
+	a	rdfs:Class ;
+	rdfs:subClassOf	daq:Metric ; 
+	daq:expectedDataType xsd:double ;
+	rdfs:comment	"Upon request of an RDF dump, checks whether it is provided as result" ;
+	rdfs:label	"Availability of the RDF dumps metric" .	
+
+ex:HumanReadableLicenseMetric
+	a	rdfs:Class ;
+	rdfs:subClassOf	daq:Metric ; 
+	daq:expectedDataType xsd:double ;
+	rdfs:comment	"Verifies whether a human-readable text, stating the licensing model attributed to the resource, has been provided as part of the dataset" ;
+	rdfs:label	"Human-readable indication of a license metric" .
+	
+ex:MisusedOwlDatatypeOrObjectPropertiesMetric
+	a	rdfs:Class ;
+	rdfs:subClassOf	daq:Metric ; 
+	daq:expectedDataType xsd:double ;
+	rdfs:comment	"Detect properties that are defined as a owl:datatype property but is used as object property and properties defined as a owl:object property and used as datatype property The metric is computed as a ratio of misused properties" ;
+	rdfs:label	"Misuse Owl datatype or object properties metric" .
+			
+# Dimension Properties
+ex:hasAvailabilityDimension
+	a	rdfs:Property ;	
+	rdfs:subPropertyOf	daq:hasDimension ;
+	rdfs:domain	ex:Accessibility ;
+	rdfs:range	ex:Availability .
+
+ex:hasLicensingDimension
+	a	rdfs:Property ;	
+	rdfs:subPropertyOf	daq:hasDimension ;
+	rdfs:domain	ex:Accessibility, ex:Intrinsic ;
+	rdfs:range	ex:Licensing .
+		
+ex:hasAvailabilityTwoDimension
+	a	rdfs:Property ;	
+	rdfs:subPropertyOf	daq:hasDimension ;
+	rdfs:domain	ex:Intrinsic ;
+	rdfs:range	ex:Availability .
+		
+ex:hasAccuracyDimension
+	a	rdfs:Property ;	
+	rdfs:subPropertyOf	daq:hasDimension ;
+	rdfs:domain	ex:Intrinsic ;
+	rdfs:range	ex:Accuracy .
+	
+	
+# Metric Properties
+ex:hasEndPointMetric
+	a	rdfs:Property ;	
+	rdfs:subPropertyOf	daq:hasMetric ;
+	rdfs:domain	ex:Availability ;
+	rdfs:range	ex:EndPointAvailabilityMetric .
+
+ex:hasHumanReadableMetric
+	a	rdfs:Property ;	
+	rdfs:subPropertyOf	daq:hasMetric ;
+	rdfs:domain	ex:Licensing ;
+	rdfs:range	ex:HumanReadableLicenseMetric.
+	
+ex:hasMisuseMetric
+	a	rdfs:Property ;	
+	rdfs:subPropertyOf	daq:hasMetric ;
+	rdfs:domain	ex:Accuracy ;
+	rdfs:range	ex:MisusedOwlDatatypeOrObjectPropertiesMetric .
