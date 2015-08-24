@@ -21,6 +21,16 @@ public class Resource {
 	final static Logger logger = LoggerFactory.getLogger(Resource.class);
 	
 	@POST
+	@Path("status")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response status() {
+		return Response.ok("Service is Online",MediaType.APPLICATION_JSON).header("Access-Control-Allow-Origin", "*")
+				.header("Access-Control-Allow-Methods", "POST, GET, PUT, UPDATE, OPTIONS")
+			      .header("Access-Control-Allow-Headers", "x-requested-with, x-requested-by").build();
+	}
+	
+	
+	@POST
 	@Path("validate")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response validate(MultivaluedMap<String, String> formParams) {
@@ -86,15 +96,4 @@ public class Resource {
 				.header("Access-Control-Allow-Methods", "POST, GET, PUT, UPDATE, OPTIONS")
 			      .header("Access-Control-Allow-Headers", "x-requested-with, x-requested-by").build();
 	}
-
-	
-	@POST
-	@Path("edit")
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response edit(MultivaluedMap<String, String> formParams) {
-	
-		
-		return null;
-	}
-
 }
