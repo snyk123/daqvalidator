@@ -66,7 +66,7 @@ function callAPI(type,input){
 		$("#main-content").append("<div class='modal fade in' style='display:block' aria-hidden='false' id='popup'><div class='modal-dialog'><div class='modal-content'><div class='modal-header'><button type='button' class='close' data-dismiss='modal' aria-hidden='true'>×</button><h4 class='modal-title'>No Schema Error</h4></div> <div class='modal-body'> <p>There is no schema to validate.</p> </div> </div> </div> </div><div class='modal-backdrop fade in'></div>");
 	}
 	else{
-		$.ajax(urlLocal, {
+		$.ajax(urlCloud, {
 			type:"POST",
 			dataType:"json",
 			data:{
