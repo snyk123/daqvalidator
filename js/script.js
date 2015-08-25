@@ -66,7 +66,7 @@ function callAPI(type,input){
 		$("#main-content").append("<div class='modal fade in' style='display:block' aria-hidden='false' id='popup'><div class='modal-dialog'><div class='modal-content'><div class='modal-header'><button type='button' class='close' data-dismiss='modal' aria-hidden='true'>×</button><h4 class='modal-title'>No Schema Error</h4></div> <div class='modal-body'> <p>There is no schema to validate.</p> </div> </div> </div> </div><div class='modal-backdrop fade in'></div>");
 	}
 	else{
-		$.ajax(urlCloud, {
+		$.ajax(urlLocal, {
 			type:"POST",
 			dataType:"json",
 			data:{
@@ -97,8 +97,8 @@ function visualise(data){
 		
 		//categories	
 	    $.each(data.category, function() {
-			$("#category").append("<a href='#' class='list-group-item' onClick='getDim(\""+this.name+"\")'><span class='badge'>"+this.dimension.length+"</span>"+this.name+"</a>");
-	    	dimensionHashMap.setItem(this.name, this.dimension);
+			$("#category").append("<a href='#' class='list-group-item' onClick='getDim(\""+this.name+"\")'><span class='badge'>"+this.dimensions.length+"</span>"+this.name+"</a>");
+	    	dimensionHashMap.setItem(this.name, this.dimensions);
 		});
 		
 		//errors
@@ -130,8 +130,8 @@ function getDim(category){
 	var dimensions = dimensionHashMap.getItem(category);
 	$("#dimension").html("");
     $.each(dimensions, function() {
-		$("#dimension").append("<a href='#' class='list-group-item' onClick='getMet(\""+this.name+"\")'><span class='badge'>"+this.metric.length+"</span>"+this.name+"</a>");
-		metricHashMap.setItem(this.name, this.metric)
+		$("#dimension").append("<a href='#' class='list-group-item' onClick='getMet(\""+this.name+"\")'><span class='badge'>"+this.metrics.length+"</span>"+this.name+"</a>");
+		metricHashMap.setItem(this.name, this.metrics)
 	});
 }
 
@@ -139,6 +139,6 @@ function getMet(dimension){
 	var metrics = metricHashMap.getItem(dimension);
 	$("#metric").html("");
     $.each(metrics, function() {
-		$("#metric").append("<span class='list-group-item'>"+this+"</span>");
+		$("#metric").append("<span class='list-group-item'>"+this.name+"</span>");
 	});
 }
