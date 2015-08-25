@@ -131,8 +131,9 @@ public class Validator {
 	    
 	    while (rs.hasNext()){
 	    	QuerySolution qs = rs.next();
+	    	int c = qs.get("cat").asLiteral().getInt();
+	    	if (c == 0) continue;
 	    	String d = qs.get("dimension").asResource().getLocalName();
-	    	String c = qs.get("cat").asLiteral().getString();
 	    	
 	    	error.addMessage("The dimension " + d + " is in " + c + " categories. ");
 	    }
@@ -147,7 +148,8 @@ public class Validator {
 	    
 	    while (rs.hasNext()){
 	    	QuerySolution qs = rs.next();
-	    	String d = qs.get("dim").asResource().getLocalName();
+	    	int d = qs.get("dim").asLiteral().getInt();
+	    	if (d == 0) continue;
 	    	String met = qs.get("metric").asResource().getLocalName();
 
 	    	error.addMessage("The metric " + met + " is in " + d + " dimensions. ");
@@ -160,14 +162,13 @@ public class Validator {
 	   
 	    if (error.getTotal() > 0)
     	{
-	    	json = "\"errors\" : {";
+	    	json = "\"errors\" : ";
 	    	ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
 			try {
 				json += ow.writeValueAsString(error);
 			} catch (JsonProcessingException e) {
 				logger.error("Error transforming to json : {}", e.getMessage());
 			}
-			json += "}";
     	}
 
 	    
@@ -207,18 +208,18 @@ public class Validator {
 	    	warning.addMessage("The metric " + metric + " is not linked to any category");
 
 	    }
+	    warning.setTotal(warning.getMessages().size());
 	    
 	    String json = "";
 	    if (warning.getTotal() > 0)
     	{
-	    	json = "\"warnings\" : {";
+	    	json = "\"warnings\" : ";
 	    	ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
 			try {
 				json += ow.writeValueAsString(warning);
 			} catch (JsonProcessingException e) {
 				logger.error("Error transforming to json : {}", e.getMessage());
 			}
-			json += "}";
     	}
 
 	    
