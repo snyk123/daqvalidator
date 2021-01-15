@@ -14,7 +14,7 @@
 		<slf4j.version>1.7.5</slf4j.version>
 		<jena.version>2.13.0</jena.version>
 		<grizzly.version>2.11</grizzly.version>
-		<jerseymedia.version>2.11</jerseymedia.version>
+		<jerseymedia.version>3.0.0</jerseymedia.version>
 		<guava.version>18.0</guava.version>
 		<jackson.version>1.9.13</jackson.version>
 		
